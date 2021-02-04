@@ -6,6 +6,7 @@ import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import ru.vaseba.vaseba_bot.botapi.TelegramFacade;
 
 public class MyVasebaTelegramBot extends TelegramWebhookBot {
 
@@ -13,9 +14,12 @@ public class MyVasebaTelegramBot extends TelegramWebhookBot {
     private String botUserName;
     private String botToken;
 
+    private TelegramFacade telegramFacade;
 
-    public MyVasebaTelegramBot(DefaultBotOptions botOptions) {
+
+    public MyVasebaTelegramBot(DefaultBotOptions botOptions, TelegramFacade telegramFacade) {
         super(botOptions);
+        this.telegramFacade = telegramFacade;
     }
 
 
@@ -36,18 +40,9 @@ public class MyVasebaTelegramBot extends TelegramWebhookBot {
 
     @Override
     public BotApiMethod<?> onWebhookUpdateReceived(Update update) {
-        if (update.getMessage() != null && update.getMessage().hasText()) {
-            long chat_id = update.getMessage().getChatId();
+        SendMessage replyMessageToUser = telegramFacade.handlerUpdate(update);
 
-
-            try {
-                execute(new SendMessage(chat_id, "Hi " + update.getMessage().getText()));
-            } catch (TelegramApiException e) {
-                e.printStackTrace();
-            }
-        }
-
-        return null;
+        return replyMessageToUser;
     }
 
 
